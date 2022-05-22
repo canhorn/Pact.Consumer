@@ -76,4 +76,12 @@ jobs:
             broker record-deployment \
             --pacticipant ${PACTICIPANT} \
             --version ${GIT_COMMIT} \
-            --environment ${PACT_ENV} \
+            --environment ${PACT_ENV}
+
+      - name: Add Env Tag to Version
+        run: |
+          docker run --rm -e PACT_BROKER_BASE_URL -e PACT_BROKER_TOKEN pactfoundation/pact-cli:latest \
+            broker create-version-tag \
+            --pacticipant ${PACTICIPANT} \
+            --version ${GIT_COMMIT} \
+            --tag ${PACT_ENV}
