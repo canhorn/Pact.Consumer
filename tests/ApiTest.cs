@@ -94,7 +94,7 @@ public class ApiTest : IClassFixture<ConsumerPactClassFixture>
                 new PactNet.Mocks.MockHttpService.Models.ProviderServiceRequest
                 {
                     Method = HttpVerb.Get,
-                    Path = "/api/products/10",
+                    Path = "/api/product/10",
                 }
             )
             // .WithRequest(HttpMethod.Get, "/api/products")
