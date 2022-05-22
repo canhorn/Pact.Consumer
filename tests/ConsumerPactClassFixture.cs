@@ -27,7 +27,7 @@ public class ConsumerPactClassFixture : IDisposable
 
     public ConsumerPactClassFixture()
     {
-        var pactDir = Environment.GetEnvironmentVariable("PACT_DIR") ?? "./pacts";
+        var pactDir = Environment.GetEnvironmentVariable("PACTS_DIR") ?? "./pacts";
         var serviceConsumer = Environment.GetEnvironmentVariable("PACTICIPANT") ?? "api-client";
         // Using Spec version 3.0.0 more details at https://goo.gl/UrBSRc
         var pactConfig = new PactConfig
