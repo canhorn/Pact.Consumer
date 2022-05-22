@@ -40,11 +40,10 @@ jobs:
 
       - name: Publish Pacts
         run: |
-          docker run --rm -e PACT_BROKER_BASE_URL -e PACT_BROKER_TOKEN pactfoundation/pact-cli:latest \
+          docker run --rm -v ${PACTS_DIR}:/pacts -e PACT_BROKER_BASE_URL -e PACT_BROKER_TOKEN pactfoundation/pact-cli:latest \
             publish /pacts \
             --consumer-app-version ${GIT_COMMIT} \
-            --tag ${GIT_BRANCH} \
-            --tag ${PACT_ENV}
+            --tag ${GIT_BRANCH}
 
   can-i-deploy:
     runs-on: ubuntu-latest
