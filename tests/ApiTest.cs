@@ -73,14 +73,6 @@ public class ApiTest : IClassFixture<ConsumerPactClassFixture>
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-
-        // await pact.VerifyAsync(
-        //     async ctx =>
-        //     {
-        //         var response = await _apiClient.GetAllProducts();
-        //         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        //     }
-        // );
     }
 
     [Fact]
@@ -122,13 +114,5 @@ public class ApiTest : IClassFixture<ConsumerPactClassFixture>
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-
-        // await pact.VerifyAsync(
-        //     async ctx =>
-        //     {
-        //         var response = await _apiClient.GetProduct(10);
-        //         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        //     }
-        // );
     }
 }
