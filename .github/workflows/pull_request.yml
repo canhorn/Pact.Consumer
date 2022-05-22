@@ -71,10 +71,10 @@ jobs:
       - name: Deploy
         run: echo "Deploy to Stage"
 
-      - name: Deploy
+      - name: Record Pact Deployment
         run: |
           docker run --rm -e PACT_BROKER_BASE_URL -e PACT_BROKER_TOKEN pactfoundation/pact-cli:latest \
             broker record-deployment \
             --pacticipant ${PACTICIPANT} \
-            --version ${GIT_COMMIT} 
+            --version ${GIT_COMMIT} \
             --environment ${PACT_ENV} \
