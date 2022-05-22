@@ -37,7 +37,7 @@ jobs:
 
       - name: Run Tests
         env: 
-          PACTS_DIR: "${{ GITHUB_WORKSPACE }}/pacts"
+          PACTS_DIR: "${{ github.workspace }}/pacts"
         run: dotnet test tests
 
   publish-pacts:
@@ -48,7 +48,7 @@ jobs:
       - run: docker pull pactfoundation/pact-cli:latest
       - name: Publish Pacts
         env: 
-          PACTS_DIR: "${{ GITHUB_WORKSPACE }}/pacts"
+          PACTS_DIR: "${{ github.workspace }}/pacts"
         run: |
           docker run --rm -v ${PACTS_DIR}:/pacts -e PACT_BROKER_BASE_URL -e PACT_BROKER_TOKEN pactfoundation/pact-cli:latest \
             publish /pacts \
