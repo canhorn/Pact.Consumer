@@ -1,0 +1,87 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+env:
+  DOTNET_CORE_VERSION: 6.0.x
+  PACTS_DIR: "${{ GITHUB_WORKSPACE }}/pacts"
+  PACT_BROKER_BASE_URL: ${{ secrets.PACTFLOW_URL }}
+  PACT_BROKER_TOKEN: ${{ secrets.PACTFLOW_TOKEN }}
+  PACT_BROKER_PUBLISH_VERIFICATION_RESULTS: true
+  PACT_ENV: production
+  GIT_BRANCH: main
+  GIT_COMMIT: ${{ github.sha }}
+  GITHUB_REF: ${{ github.event.repository.name }}
+  # ${{ secrets.STACK_ID }}
+  PACTICIPANT: api-client
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Setup .NET Core SDK ${{ env.DOTNET_CORE_VERSION }}
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+
+      - name: Restore Packages
+        run: dotnet restore
+
+      - name: Build Application
+        run: dotnet build --no-restore
+
+      - name: Run Tests
+        run: dotnet test tests
+
+  publish-pacts:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v2
+      - run: docker pull pactfoundation/pact-cli:latest
+      - name: Publish Pacts
+        run: |
+          docker run --rm -v ${PACTS_DIR}:/pacts -e PACT_BROKER_BASE_URL -e PACT_BROKER_TOKEN pactfoundation/pact-cli:latest \
+            publish /pacts \
+            --consumer-app-version ${GIT_COMMIT} \
+            --tag ${GIT_BRANCH} \
+            --tag ${PACT_ENV}
+
+  can-i-deploy:
+    runs-on: ubuntu-latest
+    needs: publish-pacts
+    steps:
+      - uses: actions/checkout@v2
+      - run: docker pull pactfoundation/pact-cli:latest
+      - name: Can I deploy?
+        run: |
+          docker run --rm -e PACT_BROKER_BASE_URL -e PACT_BROKER_TOKEN pactfoundation/pact-cli:latest \
+            broker can-i-deploy \
+            --pacticipant ${PACTICIPANT} \
+            --version ${GIT_COMMIT} \
+            --to ${PACT_ENV}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: can-i-deploy
+    steps:
+      - uses: actions/checkout@v2
+      
+      - run: docker pull pactfoundation/pact-cli:latest
+
+      - name: Deploy
+        run: echo "Deploy to Production"
+
+      - name: Deploy
+        run: |
+          docker run --rm -e PACT_BROKER_BASE_URL -e PACT_BROKER_TOKEN pactfoundation/pact-cli:latest \
+            broker record-deployment \
+            --pacticipant ${PACTICIPANT} \
+            --version ${GIT_COMMIT} 
+            --environment ${PACT_ENV} \
